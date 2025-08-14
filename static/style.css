@@ -1,0 +1,246 @@
+/* Global Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+header {
+  text-align: center;
+  padding: 20px;
+  background-color: #ffe0e9;
+}
+
+#salon-name {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2e8b8b;
+}
+
+/* Main Content Spacing */
+main {
+  margin-top: 30px;
+}
+
+/* Month/Year Rows */
+.month-container,
+.year-container {
+  display: flex;
+  align-items: center;
+  padding-left: 400px;
+  margin-bottom: 15px;
+}
+
+.month-label,
+.year-label,
+.paste-label {
+  font-size: 1.2rem;
+  font-family: "High Tower Text", serif;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+select {
+  padding: 5px 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+
+/* Paste Area */
+.paste-container {
+  margin-top: 40px;
+  padding-left: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+#paste-box {
+  width: 500px;
+  height: 150px;
+  font-size: 1rem;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  font-family: monospace;
+}
+
+/* Preview Section */
+#preview-container {
+  margin-top: 20px;
+  padding-left: 400px;
+}
+
+.preview-box {
+  width: 500px;
+  height: 200px;
+  overflow: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: white;
+  padding: 10px;
+}
+
+.preview-box table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.preview-box td,
+.preview-box th {
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  text-align: left;
+}
+
+/* Upload Section */
+.upload-container {
+  padding-left: 400px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#upload-btn,
+#send-btn {
+  padding: 8px 15px;
+  background: #2e8b8b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: fit-content;
+  transition: background 0.2s ease-in-out;
+}
+
+#upload-btn:hover,
+#send-btn:hover {
+  background: #246f6f;
+}
+
+#drop-zone {
+  width: 500px;
+  padding: 20px;
+  border: 2px dashed #aaa;
+  border-radius: 5px;
+  text-align: center;
+  background: #f9f9f9;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+#drop-zone.dragover {
+  border-color: #2e8b8b;
+  background: #e0f7f7;
+}
+
+#upload-status,
+#send-status {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Send Button Row */
+.send-container {
+  padding-left: 400px;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.admin-link {
+  text-decoration: none;
+  color: #2e8b8b;
+}
+
+.admin-link:hover {
+  text-decoration: underline;
+}
+
+/* Admin Table */
+.admin-main {
+  padding: 20px 30px;
+}
+
+.admin-controls {
+  margin-bottom: 15px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 1px solid #ddd;
+  padding: 8px 10px;
+}
+
+.admin-table th {
+  background: #f2f2f2;
+}
+
+.pasted-pre {
+  white-space: pre-wrap;
+  font-family: monospace;
+  background: #fafafa;
+  border: 1px solid #eee;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.empty {
+  padding: 10px;
+  color: #666;
+}
+
+/* --- NEW: Pasted Data Table Preview --- */
+.pasted-preview table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.pasted-preview td,
+.pasted-preview th {
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  text-align: left;
+}
+
+.pasted-preview tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Responsive Fix */
+@media (max-width: 768px) {
+  .month-container,
+  .year-container,
+  .paste-container,
+  #preview-container,
+  .upload-container,
+  .send-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  #paste-box,
+  .preview-box,
+  #drop-zone {
+    width: 100%;
+  }
+}

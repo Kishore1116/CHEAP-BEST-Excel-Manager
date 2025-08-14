@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Salon Homepage</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1 id="salon-name">SALON</h1>
+  </header>
+
+  <main>
+    <!-- Month -->
+    <div class="month-container">
+      <label for="month-select" class="month-label">Month:</label>
+      <select id="month-select" name="month">
+        <option value="">-- Select Month --</option>
+        <option>January</option><option>February</option><option>March</option>
+        <option>April</option><option>May</option><option>June</option>
+        <option>July</option><option>August</option><option>September</option>
+        <option>October</option><option>November</option><option>December</option>
+      </select>
+    </div>
+
+    <!-- Year -->
+    <div class="year-container">
+      <label for="year-select" class="year-label">Year:</label>
+      <select id="year-select" name="year">
+        <option value="">-- Select Year --</option>
+        <option>2025</option><option>2026</option><option>2027</option>
+        <option>2028</option><option>2029</option><option>2030</option>
+      </select>
+    </div>
+
+    <!-- Paste area -->
+    <div class="paste-container">
+      <label for="paste-box" class="paste-label">Paste:</label>
+      <textarea id="paste-box" name="pasted_data" placeholder="Paste Excel data here..."></textarea>
+    </div>
+
+    <!-- Table preview -->
+    <div id="preview-container">
+      <h3>Preview</h3>
+      <div class="preview-box" id="preview-box"></div>
+    </div>
+
+    <!-- Upload section -->
+    <div class="upload-container">
+      <h3>Upload Excel</h3>
+      <input type="file" id="file-upload" name="file" accept=".xlsx,.xls,.csv" hidden>
+      <button id="upload-btn">Upload Excel File</button>
+
+      <div id="drop-zone">Drag & Drop Excel file here (Max 10 MB)</div>
+      <p id="upload-status"></p>
+    </div>
+
+    <!-- Send to admin -->
+    <div class="send-container">
+      <button id="send-btn">Send to Admin</button>
+      <p id="send-status"></p>
+      <a class="admin-link" href="{{ url_for('admin') }}" target="_blank">Open Admin Page</a>
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

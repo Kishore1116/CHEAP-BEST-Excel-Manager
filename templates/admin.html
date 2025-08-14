@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Submissions by Month</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f2f5; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .admin-controls { margin-bottom: 20px; }
+    .admin-link { text-decoration: none; color: #1a73e8; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 40px; background: #fff; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #4CAF50; color: white; }
+    tr:hover { background-color: #f1f1f1; }
+    .action-buttons a, .action-buttons button { margin-right: 5px; text-decoration: none; padding: 4px 8px; border: none; cursor: pointer; }
+    .view-btn { background-color: #2196F3; color: white; }
+    .download-btn { background-color: #4CAF50; color: white; }
+    .delete-btn { background-color: #f44336; color: white; }
+    details pre { background: #eee; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto; }
+    details table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    details th, details td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    h2.month-title { margin-top: 50px; color: #333; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard - Submissions by Month</h1>
+  </header>
+
+  <main>
+    <div class="admin-controls">
+      <a class="admin-link" href="{{ url_for('index') }}">← Back to Home</a>
+    </div>
+
+    {% set submissions_by_month = {} %}
+    {% for s in submissions %}
+      {# Use the submitted month if exists, else extract from timestamp (YYYY-MM) #}
+      {% set month_name = s.month or s.timestamp[:7] %}
+
+      {% if month_name not in submissions_by_month %}
+        {% set submissions_by_month = submissions_by_month.update({month_name: [s]}) or submissions_by_month %}
+      {% else %}
+        {% set submissions_by_month = submissions_by_month.update({month_name: submissions_by_month[month_name] + [s]}) or submissions_by_month %}
+      {% endif %}
+    {% endfor %}
+
+    {% for month, month_submissions in submissions_by_month.items() %}
+      <h2 class="month-title">{{ month }} </h2>
+      <div class="action-buttons" style="margin-bottom: 10px;">
+        <a class="download-btn" href="{{ url_for('download_month', month=month) }}">Download All</a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Timestamp</th>
+            <th>Year</th>
+            <th>Details</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in month_submissions|reverse %}
+          <tr id="row-{{ s.timestamp }}">
+            <td>{{ loop.index }}</td>
+            <td>{{ s.timestamp }}</td>
+            <td>{{ s.year or '—' }}</td>
+            <td>
+              <details>
+                <summary>View Submission</summary>
+                {% if s.file %}
+                  <p><strong>File:</strong> <a href="{{ url_for('uploaded_file', filename=s.file) }}" target="_blank">{{ s.file }}</a></p>
+                {% else %}
+                  <p><strong>File:</strong> —</p>
+                {% endif %}
+                {% if s.pasted_data %}
+                  <p><strong>Pasted Data:</strong></p>
+                  <table>
+                    {% for row in s.pasted_data.splitlines() %}
+                      <tr>
+                        {% for cell in row.split('\t') %}
+                          <td>{{ cell }}</td>
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </table>
+                {% endif %}
+              </details>
+            </td>
+            <td class="action-buttons">
+              {% if s.file %}
+                <a class="download-btn" href="{{ url_for('uploaded_file', filename=s.file) }}" target="_blank">Download</a>
+              {% endif %}
+              <button class="delete-btn" onclick="deleteRow('{{ s.timestamp }}')">Delete</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </main>
+
+  <script>
+    async function deleteRow(timestamp) {
+      if (!confirm("Are you sure you want to delete this submission?")) return;
+
+      const response = await fetch('/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timestamp })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        document.getElementById('row-' + timestamp).remove();
+        alert('Deleted successfully!');
+      } else {
+        alert('Failed to delete: ' + result.error);
+      }
+    }
+  </script>
+</body>
+</html>

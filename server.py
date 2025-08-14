@@ -7,11 +7,11 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = "kishore55@"  # Change this to a strong secret key
 
-# Hardcoded admin credentials
+# --- Admin Credentials ---
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "kishore55"  # Change this to your desired password
 
-# Decorator to protect admin pages
+# --- Login Required Decorator ---
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -21,14 +21,14 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Config
+# --- Config ---
 UPLOAD_FOLDER = os.path.join(app.root_path, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 DATA_FILE = os.path.join(UPLOAD_FOLDER, "submissions.json")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB
 
-# Load/save helper
+# --- Helpers to Load/Save Data ---
 def load_submissions():
     if os.path.exists(DATA_FILE):
         try:
@@ -44,7 +44,7 @@ def save_submissions(data):
 
 submissions = load_submissions()
 
-# Login route
+# --- Login ---
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -57,7 +57,7 @@ def login():
             flash("Invalid username or password", "error")
     return render_template("login.html")
 
-# Logout route
+# --- Logout ---
 @app.route("/logout")
 @login_required
 def logout():
@@ -65,17 +65,19 @@ def logout():
     flash("Logged out successfully.", "success")
     return redirect(url_for("login"))
 
-# Routes
+# --- Index ---
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# --- Admin Dashboard ---
 @app.route("/admin")
 @login_required
 def admin_dashboard():
     current = load_submissions()
     return render_template("admin.html", submissions=current)
 
+# --- File Upload ---
 @app.route("/upload", methods=["POST"])
 def upload_file():
     file = request.files.get("file")
@@ -98,6 +100,7 @@ def upload_file():
 
     return jsonify({"success": True, "filename": filename})
 
+# --- Submit Data ---
 @app.route("/submit", methods=["POST"])
 @app.route("/send-data", methods=["POST"])
 def submit():
@@ -125,11 +128,12 @@ def submit():
 
     return jsonify({"success": True, "message": "Saved"})
 
+# --- Serve Uploaded Files ---
 @app.route("/uploads/<path:filename>")
 def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename, as_attachment=True)
 
-# --- Delete Endpoint ---
+# --- Delete Submission ---
 @app.route("/delete", methods=["POST"])
 @login_required
 def delete_submission():
@@ -137,16 +141,14 @@ def delete_submission():
     ts = data.get("timestamp")
     global submissions
 
-    # Remove submission from list
-    submissions = [s for s in submissions if s["timestamp"] != ts]
-
-    # Delete uploaded file if exists
-    for s in submissions:
-        if s["timestamp"] == ts and s.get("file"):
-            filepath = os.path.join(app.config["UPLOAD_FOLDER"], s["file"])
-            if os.path.exists(filepath):
-                os.remove(filepath)
-            break
+    # Find and remove the matching record
+    for s in submissions[:]:
+        if s["timestamp"] == ts:
+            if s.get("file"):
+                filepath = os.path.join(app.config["UPLOAD_FOLDER"], s["file"])
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+            submissions.remove(s)
 
     save_submissions(submissions)
     return jsonify({"success": True})
@@ -155,10 +157,11 @@ def delete_submission():
 @app.route("/download_month/<month>")
 @login_required
 def download_month(month):
-    # Collect all files for the month
     month_submissions = []
     for s in submissions:
-        submission_month = s['month'] if s['month'] else datetime.strptime(s['timestamp'], "%Y-%m-%d %H:%M:%S").strftime("%B")
+        submission_month = s['month'] if s['month'] else datetime.strptime(
+            s['timestamp'], "%Y-%m-%d %H:%M:%S"
+        ).strftime("%B")
         if submission_month == month:
             month_submissions.append(s)
 
@@ -175,6 +178,6 @@ def download_month(month):
     memory_file.seek(0)
     return send_file(memory_file, download_name=f"{month}_submissions.zip", as_attachment=True)
 
-# Run
+# --- Run App ---
 if __name__ == "__main__":
     app.run(debug=True)
